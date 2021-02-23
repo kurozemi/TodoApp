@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { View, Text, TouchableOpacity, SectionList, TextInput, KeyboardAvoidingView, Keyboard } from 'react-native'
-import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
+import { Calendar } from 'react-native-calendars';
 
 import FloatingButton from '../../img/plus.svg'
 import style from './Home.style'
@@ -78,11 +78,41 @@ const defaultNewTask = {
     taskEndDate: formatDate(new Date()),
 }
 
-const Home = ({navigation}) => {
+const Home = ({ navigation, route }) => {
     const [tasks, setTasks] = useState(dummyTask);
     const [isCreateTask, setIsCreateTask] = useState(false);
     const [newTaskData, setNewTaskData] = useState(defaultNewTask);
 
+    useEffect(() => {
+        tasks[1].data.forEach((item,index) => {
+            if (Date.parse(formatDate(new Date())) >= Date.parse(item.taskStartDate)){
+                let newTasks = JSON.parse(JSON.stringify(tasks));
+                newTasks[0].data.push(item);
+                newTasks[1].data.splice(index, 1);
+
+                setTasks(newTasks);
+            }
+        })
+    },[tasks[1].data])
+    useEffect(() => {
+        if (route.params?.newItem) {
+
+            let item = route.params.newItem;
+            let index = route.params.index;
+            let status = route.params.status;
+
+            let newTasks = JSON.parse(JSON.stringify(tasks));
+            if (route.params.delete) {
+                newTasks[status].data.splice(index, 1);
+            }
+            else {
+                newTasks[status].data[index] = item;
+            }
+
+            setTasks(newTasks);
+        }
+
+    }, [route.params?.newItem]);
     const [isChooseDayStart, setIsChooseDayStart] = useState({
         checked: false,
         date: '',
@@ -116,13 +146,14 @@ const Home = ({navigation}) => {
     const addNewTask = () => {
         let newTasks = JSON.parse(JSON.stringify(tasks));
         newTasks[1].data.push({
-            taskName: [newTaskData.taskName],
-            taskStartDate: [newTaskData.taskStartDate],
-            taskEndDate: [newTaskData.taskEndDate],
+            taskName: newTaskData.taskName,
+            taskStartDate: newTaskData.taskStartDate,
+            taskEndDate: newTaskData.taskEndDate,
         });
         setTasks(newTasks);
         setNewTaskData(defaultNewTask);
         setIsCreateTask(false);
+        console.log('new task:', newTaskData);
     }
 
     const setCalender = (StartDay, EndDay) => {
@@ -155,18 +186,19 @@ const Home = ({navigation}) => {
                     keyExtractor={(item, index) => item + index}
                     renderItem={({ item, index, section }) => (
                         <TouchableOpacity
-                            style = {[
-                                style.card, 
+                            style={[
+                                style.card,
                                 section.status == 'Completed' ? style.completeCard
-                                : section.status == 'On progress' ? style.doingCard
-                                : style.notStartCard
+                                    : section.status == 'On progress' ? style.doingCard
+                                        : style.notStartCard
                             ]}
-                            onPress = {() => navigation.push('Detail', {
-                                tasks: tasks,
-                                status: section.status,
-                                index: index,
-                                item: item
-                            })}
+                            onPress={() =>
+                                navigation.push('Detail', {
+                                    status: section.status,
+                                    index: index,
+                                    item: item
+                                })
+                            }
                         >
                             <TouchableOpacity
                                 onPress={() => {
@@ -180,7 +212,7 @@ const Home = ({navigation}) => {
                                     {section.status == "Completed" ? true : false}
                                 />
                             </TouchableOpacity>
-                            <View 
+                            <View
                                 style={style.cardData}
                             >
                                 <Text
@@ -188,25 +220,25 @@ const Home = ({navigation}) => {
                                         ? [style.cardHeading, style.completedHeading]
                                         : style.cardHeading}
                                 >
-                                    {item.taskName}</Text>
-                                <View style = {style.row}>
-                                <Text style={style.cardDate}>Deadline: {item.taskEndDate}</Text>
-                                {
-                                    Date.parse(item.taskEndDate) < Date.parse(formatDate(new Date())) && section.status == 'On progress'
-                                    ? <Text style = {style.overdue}> !Overdue</Text>
-                                    : <></>
-                                }
+                                    {item.taskName ? item.taskName : '(No title)'}</Text>
+                                <View style={style.row}>
+                                    <Text style={style.cardDate}>Deadline: {item.taskEndDate}</Text>
+                                    {
+                                        Date.parse(item.taskEndDate) < Date.parse(formatDate(new Date())) && section.status == 'On progress'
+                                            ? <Text style={style.overdue}> !Overdue</Text>
+                                            : <></>
+                                    }
                                 </View>
                             </View>
                         </TouchableOpacity>
                     )}
-                    renderSectionHeader={({section}) => (
+                    renderSectionHeader={({ section }) => (
                         section.data.length ?
-                        <View style={style.sectionContainer}>
-                            <Text style={style.section}>{section.status}</Text>
-                        </View>
-                        :
-                        <></>
+                            <View style={style.sectionContainer}>
+                                <Text style={style.section}>{section.status}</Text>
+                            </View>
+                            :
+                            <></>
                     )}
 
                 />
@@ -241,7 +273,7 @@ const Home = ({navigation}) => {
                         </View>
 
                         <View>
-                            <View style={[style.row, {paddingBottom: 8}]}>
+                            <View style={[style.row, { paddingBottom: 8 }]}>
                                 <Text>Start date:  </Text>
                                 <TouchableOpacity
                                     style={style.chooseDate}
@@ -298,21 +330,32 @@ const Home = ({navigation}) => {
                             style={style.subContainer}
                             activeOpacity={1}
                         >
-                            <Calendar
-                                hideExtraDays={true}
-                                enableSwipeMonths={true}
-                                style={style.calender}
-                                minDate={isChooseDayStart.checked ? Date() : newTaskData.taskStartDate}
-                                markedDates={{
-                                    [isChooseDayStart.date]: { selectedColor: '#7eeda8', textColor: 'white', selected: true },
-                                    [isChooseDayEnd.date]: { selectedColor: '#7eeda8', textColor: 'white', selected: true }
-                                }}
-                                onDayPress={(time) => {
-                                    isChooseDayStart.checked
-                                        ? setIsChooseDayStart({ checked: true, date: time.dateString })
-                                        : setIsChooseDayEnd({ checked: true, date: time.dateString })
-                                }}
-                            />
+                            {
+                                isChooseDayStart.checked ?
+                                    <Calendar
+                                        hideExtraDays={true}
+                                        enableSwipeMonths={true}
+                                        style={style.calender}
+                                        minDate={formatDate(new Date())}
+                                        markedDates={{
+                                            [isChooseDayStart.date]: { selectedColor: '#7eeda8', textColor: 'white', selected: true },
+                                        }}
+                                        onDayPress={(time) => setIsChooseDayStart({ checked: true, date: time.dateString })}
+                                    />
+                                    :
+                                    <Calendar
+                                        hideExtraDays={true}
+                                        enableSwipeMonths={true}
+                                        style={style.calender}
+                                        minDate={newTaskData.taskStartDate}
+                                        markedDates={{
+                                            [isChooseDayEnd.date]: { selectedColor: '#7eeda8', textColor: 'white', selected: true }
+                                        }}
+                                        onDayPress={(time) =>
+                                            setIsChooseDayEnd({ checked: true, date: time.dateString })
+                                        }
+                                    />
+                            }
                             <View style={style.footerCalender}>
                                 <TouchableOpacity
                                     onPress={() => cancelCalender()}

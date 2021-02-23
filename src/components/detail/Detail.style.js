@@ -55,8 +55,41 @@ const style = StyleSheet.create({
         alignItems: 'center',
         flexDirection: 'row',
     },
+    note: {
+        textAlignVertical: 'top',
+    },
     cardNote: {
-        height: '25%',
+        paddingTop: 5,
+    },
+    calenderContainer:{
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        zIndex: 1,
+        backgroundColor: 'rgba(0,0,0,0.8)',
+    },
+    subContainer:{
+        marginTop: '40%',
+        position: 'relative'
+    }, 
+    calender: {
+        width: '90%',
+        borderRadius: 10,
+        paddingBottom: 40,
+        paddingTop: 20,
+        marginLeft:'5%'
+    },
+    footerCalender: {
+        width: '30%',
+        justifyContent: 'space-around',
+        flex: 1,
+        flexDirection: 'row',
+        position: 'absolute',
+        bottom: 20,
+        right: 30,
+    }, 
+    footerText: {
+        fontSize: 15,
     },
 })
 export default style;
