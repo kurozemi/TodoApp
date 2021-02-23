@@ -6,7 +6,6 @@ import FloatingButton from '../../img/plus.svg'
 import style from './Home.style'
 import MyCheckBox from './child/Checkbox'
 import Confirm from '../../img/up-arrow.svg'
-import { set } from 'react-native-reanimated';
 
 const dummyTask = [
     {
@@ -79,7 +78,7 @@ const defaultNewTask = {
     taskEndDate: formatDate(new Date()),
 }
 
-const Home = () => {
+const Home = ({navigation}) => {
     const [tasks, setTasks] = useState(dummyTask);
     const [isCreateTask, setIsCreateTask] = useState(false);
     const [newTaskData, setNewTaskData] = useState(defaultNewTask);
@@ -162,6 +161,12 @@ const Home = () => {
                                 : section.status == 'On progress' ? style.doingCard
                                 : style.notStartCard
                             ]}
+                            onPress = {() => navigation.push('Detail', {
+                                tasks: tasks,
+                                status: section.status,
+                                index: index,
+                                item: item
+                            })}
                         >
                             <TouchableOpacity
                                 onPress={() => {

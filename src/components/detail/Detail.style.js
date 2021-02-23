@@ -35,7 +35,7 @@ const style = StyleSheet.create({
     }, 
     text: {
         fontSize: 17,
-        color: 'black'
+        color: 'black',
     },
     dateText: {
         color: 'rgba(0,0,0,0.6)'
