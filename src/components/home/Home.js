@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useLayoutEffect } from 'react'
 import { View, Text, TouchableOpacity, SectionList, TextInput, KeyboardAvoidingView, Keyboard } from 'react-native'
 import { Calendar } from 'react-native-calendars';
 
@@ -6,6 +6,7 @@ import FloatingButton from '../../img/plus.svg'
 import style from './Home.style'
 import MyCheckBox from './child/Checkbox'
 import Confirm from '../../img/up-arrow.svg'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const dummyTask = [
     {
@@ -61,8 +62,21 @@ const dummyTask = [
 
 ];
 
-
-
+const blankTask = [
+    {
+        status: 'On progress',
+        data: []
+    },
+    {
+        status: 'Not started',
+        data: []
+    },
+    {
+        status: 'Completed',
+        data: []
+    },
+]
+var FLAG = false;
 const formatDate = (date) => {
     var dd = String(date.getDate()).padStart(2, '0');
     var mm = String(date.getMonth() + 1).padStart(2, '0');
@@ -79,13 +93,37 @@ const defaultNewTask = {
 }
 
 const Home = ({ navigation, route }) => {
-    const [tasks, setTasks] = useState(dummyTask);
+    const [tasks, setTasks] = useState(blankTask);
     const [isCreateTask, setIsCreateTask] = useState(false);
     const [newTaskData, setNewTaskData] = useState(defaultNewTask);
 
+
     useEffect(() => {
-        tasks[1].data.forEach((item,index) => {
-            if (Date.parse(formatDate(new Date())) >= Date.parse(item.taskStartDate)){
+        if (!FLAG) return;
+        AsyncStorage.setItem('data', JSON.stringify(tasks));
+    }, [tasks])
+
+    useLayoutEffect(() => {
+        const loadTask = async() => {
+            let firstTime = await AsyncStorage.getItem('first');
+            if (firstTime == null) {
+                console.log('first time run');
+                await AsyncStorage.setItem('first', 'key');
+                await AsyncStorage.setItem('data', JSON.stringify(dummyTask));
+            }
+            let tempData = await AsyncStorage.getItem('data');
+            setTasks(JSON.parse(tempData));
+        }
+        loadTask();
+    }, [])
+
+    useEffect(() => {
+        if(!FLAG) {
+            FLAG = true;
+            return;
+        }
+        tasks[1].data.forEach((item, index) => {
+            if (Date.parse(formatDate(new Date())) >= Date.parse(item.taskStartDate)) {
                 let newTasks = JSON.parse(JSON.stringify(tasks));
                 newTasks[0].data.push(item);
                 newTasks[1].data.splice(index, 1);
@@ -93,7 +131,7 @@ const Home = ({ navigation, route }) => {
                 setTasks(newTasks);
             }
         })
-    },[tasks[1].data])
+    }, [tasks[1].data])
     useEffect(() => {
         if (route.params?.newItem) {
 
