@@ -1,4 +1,4 @@
-import {StyleSheet} from 'react-native'
+import { StyleSheet} from 'react-native'
 
 const style = StyleSheet.create({
     main: {
@@ -21,6 +21,11 @@ const style = StyleSheet.create({
         fontWeight: 'bold'
     },
     card: {
+        ...Platform.select({
+            ios: {
+                padding: 15,
+            }
+        }),
         marginTop: 20,
         marginLeft: 12,
         marginRight: 10,
@@ -32,7 +37,7 @@ const style = StyleSheet.create({
     desCard: {
         flexDirection: 'row',
         alignItems: 'center',
-    }, 
+    },
     text: {
         fontSize: 17,
         color: 'black',
@@ -61,23 +66,23 @@ const style = StyleSheet.create({
     cardNote: {
         paddingTop: 5,
     },
-    calenderContainer:{
+    calenderContainer: {
         position: 'absolute',
         width: '100%',
         height: '100%',
         zIndex: 1,
         backgroundColor: 'rgba(0,0,0,0.8)',
     },
-    subContainer:{
+    subContainer: {
         marginTop: '40%',
         position: 'relative'
-    }, 
+    },
     calender: {
         width: '90%',
         borderRadius: 10,
         paddingBottom: 40,
         paddingTop: 20,
-        marginLeft:'5%'
+        marginLeft: '5%'
     },
     footerCalender: {
         width: '30%',
@@ -87,7 +92,7 @@ const style = StyleSheet.create({
         position: 'absolute',
         bottom: 20,
         right: 30,
-    }, 
+    },
     footerText: {
         fontSize: 15,
     },

@@ -1,8 +1,16 @@
-import {StyleSheet} from 'react-native'
+import {StyleSheet,Platform} from 'react-native'
 
 const style = StyleSheet.create({
     main: {
-        marginTop: 30,
+        ...Platform.select({
+            android: {
+                marginTop: '12%'
+            },
+            ios: {
+                marginTop: '17%'
+            }
+        })
+        ,
         marginBottom: 0,
         marginLeft: 15,
     },
