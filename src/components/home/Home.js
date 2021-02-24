@@ -99,29 +99,37 @@ const Home = ({ navigation, route }) => {
 
 
     useEffect(() => {
+        console.log('1.1');
         if (!FLAG) return;
         AsyncStorage.setItem('data', JSON.stringify(tasks));
+        console.log('1.2');
     }, [tasks])
 
     useLayoutEffect(() => {
         const loadTask = async() => {
+            console.log('2.1');
+            FLAG = false;
             let firstTime = await AsyncStorage.getItem('first');
+            console.log('2.2');
             if (firstTime == null) {
                 console.log('first time run');
                 await AsyncStorage.setItem('first', 'key');
                 await AsyncStorage.setItem('data', JSON.stringify(dummyTask));
             }
             let tempData = await AsyncStorage.getItem('data');
+            console.log('2.3');
             setTasks(JSON.parse(tempData));
         }
         loadTask();
     }, [])
 
     useEffect(() => {
-        if(!FLAG) {
+        console.log('3.1');
+        if(!FLAG) { 
             FLAG = true;
             return;
         }
+        console.log('3.2');
         tasks[1].data.forEach((item, index) => {
             if (Date.parse(formatDate(new Date())) >= Date.parse(item.taskStartDate)) {
                 let newTasks = JSON.parse(JSON.stringify(tasks));
