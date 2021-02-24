@@ -106,7 +106,7 @@ const Home = ({ navigation, route }) => {
     }, [tasks])
 
     useLayoutEffect(() => {
-        const loadTask = async() => {
+        const loadTask = async () => {
             console.log('2.1');
             FLAG = false;
             let firstTime = await AsyncStorage.getItem('first');
@@ -125,7 +125,7 @@ const Home = ({ navigation, route }) => {
 
     useEffect(() => {
         console.log('3.1');
-        if(!FLAG) { 
+        if (!FLAG) {
             FLAG = true;
             return;
         }
@@ -247,6 +247,7 @@ const Home = ({ navigation, route }) => {
                             }
                         >
                             <TouchableOpacity
+                                style={style.checkbox}
                                 onPress={() => {
                                     handleCheckboxes(
                                         section.status,

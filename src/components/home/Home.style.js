@@ -19,6 +19,13 @@ const style = StyleSheet.create({
         fontSize: 20,
         color: 'rgba(0,0,0,0.7)'
     },
+    checkbox: {
+        height: '150%',
+        width: '12%',
+        paddingLeft: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
     card: {
         marginBottom: 15,
         marginRight: 15,
@@ -27,6 +34,7 @@ const style = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         padding: 20,
+        paddingLeft: 0,
         borderRadius: 10,
     },
     doingCard: {
